@@ -74,15 +74,19 @@ describe('format', () => {
       .readdirSync(solidFixturesDir)
       .filter((file) => file.endsWith('.svg'));
 
-    // 对每个SVG文件进行格式化处理并保存快照
-    for (const svgFile of svgFiles) {
-      const svgContent = fs.readFileSync(
-        path.join(solidFixturesDir, svgFile),
-        'utf8',
-      );
-      const result = await format(svgContent);
+    // 并行处理所有SVG文件
+    await Promise.all(
+      svgFiles.map(async (svgFile) => {
+        const svgContent = fs.readFileSync(
+          path.join(solidFixturesDir, svgFile),
+          'utf8',
+        );
+        const result = await format(svgContent);
 
-      await expect(result).toMatchFileSnapshot(`./snapshots/solid/${svgFile}`);
-    }
+        await expect(result).toMatchFileSnapshot(
+          `./snapshots/solid/${svgFile}`,
+        );
+      }),
+    );
   });
 });
