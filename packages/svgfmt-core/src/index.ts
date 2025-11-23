@@ -3,7 +3,7 @@ import { compareColors, stringToColor } from '@iconify/utils/lib/colors';
 import type { Color } from '@iconify/utils/lib/colors/types';
 import { format as prettierFormat } from 'prettier';
 import { optimize } from 'svgo';
-import { fillify } from './fillify';
+import { type FillifyOptions, fillify } from './fillify';
 
 // 导出类型
 export * from './fillify';
@@ -169,11 +169,18 @@ const prettifySvg = async (svgContent: string): Promise<string> => {
   return await prettierFormat(svgContent, { parser: 'html' });
 };
 
+export interface FormatOptions extends FillifyOptions {
+  /** 自定义转换函数 */
+  transform?: (svg: string) => string | Promise<string>;
+}
+
 // 格式化SVG的主函数
 export async function format(
   svgContent: string,
-  options?: import('./fillify').FillifyOptions,
+  options: FormatOptions = {},
 ): Promise<string> {
+  const { transform = (svg) => svg, ...fillifyOptions } = options;
+
   // 预处理：去除尺寸、透明度、样式和脚本
   svgContent = preprocessSvg(svgContent);
 
@@ -181,7 +188,7 @@ export async function format(
   svgContent = unifySolidColorToBlack(svgContent);
 
   // 合并路径
-  svgContent = await fillify(svgContent, options);
+  svgContent = await fillify(svgContent, fillifyOptions);
 
   // 将黑色转换为currentColor
   svgContent = convertBlackToCurrentColor(svgContent);
@@ -191,6 +198,9 @@ export async function format(
 
   // 格式化代码
   svgContent = await prettifySvg(svgContent);
+
+  // 自定义转换
+  svgContent = await transform(svgContent);
 
   return svgContent;
 }

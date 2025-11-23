@@ -98,11 +98,12 @@ svgfmt/
 **参数：**
 
 - `svgContent: string` - 要处理的 SVG 内容
-- `options?: FillifyOptions` - 可选配置对象
+- `options?: FormatOptions` - 可选配置对象
 
 **选项：**
 
 - `traceResolution?: number` - 路径追踪分辨率，默认 600
+- `transform?: (svg: string) => string | Promise<string>` - 自定义转换函数
 
 **返回值：**
 
@@ -116,6 +117,17 @@ svgfmt/
 interface FillifyOptions {
   /** 路径追踪分辨率，默认: 600 */
   traceResolution?: number;
+}
+```
+
+### `FormatOptions`
+
+格式化处理的配置选项，扩展自 `FillifyOptions`。
+
+```typescript
+interface FormatOptions extends FillifyOptions {
+  /** 自定义转换函数 */
+  transform?: (svg: string) => string | Promise<string>;
 }
 ```
 
@@ -140,6 +152,22 @@ import { format } from '@svgfmt/core';
 // 处理复杂图标，提高处理质量
 const complexSvg = await format(svgContent, {
   traceResolution: 1200, // 更高分辨率，更好质量
+});
+
+// 使用自定义转换函数
+const customSvg = await format(svgContent, {
+  // 自定义转换：将所有路径设置为红色
+  transform: (svg) => svg.replace(/fill="([^"]+)"/g, 'fill="#ff0000"'),
+});
+
+// 使用异步自定义转换
+const asyncCustomSvg = await format(svgContent, {
+  // 异步自定义转换示例
+  transform: async (svg) => {
+    // 模拟异步操作，如API调用或复杂处理
+    await new Promise(resolve => setTimeout(resolve, 100));
+    return svg;
+  },
 });
 ```
 

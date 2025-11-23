@@ -55,7 +55,7 @@ const mergedSvg = await format(complexSvg, {
 **参数：**
 
 - `svgContent: string` - 要处理的 SVG 内容
-- `options?: FillifyOptions` - 可选的配置选项
+- `options?: FormatOptions` - 可选的配置选项
 
 **返回值：**
 
@@ -72,6 +72,17 @@ interface FillifyOptions {
 }
 ```
 
+### `FormatOptions`
+
+格式化处理的配置选项，扩展自 `FillifyOptions`。
+
+```typescript
+interface FormatOptions extends FillifyOptions {
+  /** 自定义转换函数 */
+  transform?: (svg: string) => string | Promise<string>;
+}
+```
+
 ## 处理流程
 
 1. **预处理**：去除尺寸、透明度、样式和脚本等不必要的属性
@@ -80,6 +91,7 @@ interface FillifyOptions {
 4. **颜色移除**：移除颜色属性，使其继承父元素颜色
 5. **SVG 优化**：使用 SVGO 进行深度优化
 6. **代码格式化**：使用 Prettier 美化输出代码
+7. **自定义转换**：执行用户提供的自定义转换函数
 
 ## 示例
 
@@ -104,6 +116,28 @@ const complexSvg = `<svg>
 
 const merged = await format(complexSvg);
 // 结果将是合并为单个路径的优化 SVG
+```
+
+### 使用自定义转换函数
+
+```typescript
+import { format } from '@svgfmt/core';
+
+// 使用同步转换函数
+const customSvg = await format(svgContent, {
+  // 自定义转换：添加class属性到svg元素
+  transform: (svg) => svg.replace(/<svg/, '<svg class="icon"'),
+});
+
+// 使用异步转换函数
+const asyncCustomSvg = await format(svgContent, {
+  // 异步自定义转换示例
+  transform: async (svg) => {
+    // 模拟异步操作
+    await new Promise(resolve => setTimeout(resolve, 50));
+    return svg;
+  },
+});
 ```
 
 ## 开发

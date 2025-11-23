@@ -51,18 +51,38 @@ describe('format', () => {
     expect(result).not.toContain('stroke-opacity');
   });
 
+  test('应该正确应用自定义transform函数', async () => {
+    // 测试自定义transform函数 - 在svg根元素添加自定义属性
+    const customTransform = (svg: string) =>
+      svg.replace(/<svg/, '<svg data-custom-transform="applied"');
+    const result = await format(singleColorSvgContent, {
+      transform: customTransform,
+    });
+
+    // 验证自定义transform已被应用
+    expect(result).toContain('data-custom-transform="applied"');
+
+    // 保存快照
+    await expect(result).toMatchFileSnapshot(
+      './snapshots/format-with-custom-transform.svg',
+    );
+  });
+
   test('应该批量处理solid文件夹下的所有SVG文件', async () => {
     // 读取solid文件夹中的所有SVG文件
-    const svgFiles = fs.readdirSync(solidFixturesDir).filter(file => file.endsWith('.svg'));
-    
+    const svgFiles = fs
+      .readdirSync(solidFixturesDir)
+      .filter((file) => file.endsWith('.svg'));
+
     // 对每个SVG文件进行格式化处理并保存快照
     for (const svgFile of svgFiles) {
-      const svgContent = fs.readFileSync(path.join(solidFixturesDir, svgFile), 'utf8');
-      const result = await format(svgContent);
-      
-      await expect(result).toMatchFileSnapshot(
-        `./snapshots/solid/${svgFile}`,
+      const svgContent = fs.readFileSync(
+        path.join(solidFixturesDir, svgFile),
+        'utf8',
       );
+      const result = await format(svgContent);
+
+      await expect(result).toMatchFileSnapshot(`./snapshots/solid/${svgFile}`);
     }
   });
 });
