@@ -22,9 +22,11 @@ const customSvg = await format(svgContent, {
 
 ### 颜色处理
 
-- **单色统一**：检测并统一单一颜色的 SVG 元素
-- **颜色移除**：移除固定的颜色值，使其继承父元素的颜色
+- **单色优化**：自动将单色 SVG 转换为使用 `currentColor`，以便通过 CSS 继承颜色
+- **颜色移除**：移除单色图标的固定颜色值
 - **透明度处理**：移除不必要的透明度属性
+
+**注意**：本工具**仅适用于单色图标**。多色 SVG 会在路径追踪过程中被转换为单色，因为工具会将 SVG 转换为 PNG 再转回 SVG，这个过程会丢失颜色信息。
 
 ### 路径优化
 
@@ -143,7 +145,12 @@ import { format } from '@svgfmt/core';
 // 处理单色图标
 const svgContent = `<svg><path fill="#ff0000" d="..."/></svg>`;
 const optimized = await format(svgContent);
-// 结果: <svg><path d="..."/></svg> // 颜色被移除，继承父元素颜色
+// 结果: <svg><path d="..."/></svg> // 颜色被移除，使用 currentColor 继承父元素颜色
+
+// 注意：多色 SVG 会被转换为单色
+const multiColorSvg = `<svg><path fill="#ff0000" d="..."/><path fill="#00ff00" d="..."/></svg>`;
+const converted = await format(multiColorSvg);
+// 结果: 所有元素合并为单个黑色路径（颜色信息丢失）
 ```
 
 ### 高级配置

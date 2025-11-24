@@ -22,9 +22,11 @@ const customSvg = await format(svgContent, {
 
 ### Color Processing
 
-- **Single Color Unification**: Detects and unifies SVG elements with a single color
-- **Color Removal**: Removes fixed color values to inherit parent element color
+- **Single Color Optimization**: Automatically converts single-color SVGs to use `currentColor` for CSS color inheritance
+- **Color Removal**: Removes fixed color values from single-color icons
 - **Opacity Handling**: Removes unnecessary opacity attributes
+
+**Note**: This tool is designed for **single-color icons only**. Multi-color SVGs will be converted to single-color during the path tracing process, as the tool converts SVG to PNG and back to SVG, which loses color information.
 
 ### Path Optimization
 
@@ -143,7 +145,12 @@ import { format } from '@svgfmt/core';
 // Process single-color icon
 const svgContent = `<svg><path fill="#ff0000" d="..."/></svg>`;
 const optimized = await format(svgContent);
-// Result: <svg><path d="..."/></svg> // Color removed, inherits parent element color
+// Result: <svg><path d="..."/></svg> // Color removed, uses currentColor to inherit parent color
+
+// Note: Multi-color SVGs will be converted to single-color
+const multiColorSvg = `<svg><path fill="#ff0000" d="..."/><path fill="#00ff00" d="..."/></svg>`;
+const converted = await format(multiColorSvg);
+// Result: Single black path merged from all elements (color information lost)
 ```
 
 ### Advanced Configuration

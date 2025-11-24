@@ -28,12 +28,13 @@ const customSvg = await format(svgContent, {
 
 ### Color Processing
 
-The library automatically detects colors in SVG and performs the following processing:
+The library automatically processes colors in SVG:
 
 - **Single Color Detection**: Identifies SVGs that use only one color
-- **Color Removal**: Unifies single colors to black, then removes color attributes to inherit parent element color
-- **Multi-color Preservation**: For multi-color SVGs, maintains original colors unchanged
+- **Color Removal**: Unifies single colors to black, then converts to `currentColor` to inherit parent element color
 - **Opacity Handling**: Removes unnecessary opacity attributes
+
+**Important**: This library is designed for **single-color icons only**. Multi-color SVGs will be converted to single-color during the path tracing process (SVG → PNG → SVG), which loses color information.
 
 ### Path Merging
 
@@ -117,7 +118,15 @@ const complexSvg = `<svg>
 </svg>`;
 
 const merged = await format(complexSvg);
-// Result will be an optimized SVG merged into a single path
+// Result will be a single optimized path with color removed
+
+// Note: Multi-color SVGs will lose color information
+const multiColorSvg = `<svg>
+  <path d="..." fill="#ff0000"/>
+  <path d="..." fill="#00ff00"/>
+</svg>`;
+const converted = await format(multiColorSvg);
+// Result: Single black path merged from all elements (colors lost)
 ```
 
 ### Using Custom Transform Function
