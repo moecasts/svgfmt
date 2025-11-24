@@ -180,4 +180,4 @@ This library uses the following technologies to implement its functionality:
 
 ## License
 
-[View License File](../../LICENSE)
+MIT

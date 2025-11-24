@@ -180,4 +180,4 @@ pnpm test
 
 ## 许可证
 
-[查看许可证文件](../../LICENSE)
+MIT

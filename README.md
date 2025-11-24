@@ -184,4 +184,4 @@ This project uses modern frontend development toolchain:
 
 ## License
 
-[View License File](LICENSE)
+MIT
