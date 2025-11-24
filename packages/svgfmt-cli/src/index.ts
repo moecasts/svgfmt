@@ -1,5 +1,5 @@
 // Export main formatting functions
-export { formatPattern, formatFiles } from './formatter';
+export { formatFiles, formatPattern } from './formatter';
 
 // Export types
 export type {

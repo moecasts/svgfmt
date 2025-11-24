@@ -59,7 +59,7 @@ async function formatSingleFile(
       throw new Error('Invalid SVG file: must contain <svg> element');
     }
 
-    // Format the SVG
+    // Format the SVG with the provided options (including transform if present)
     const formatted = await format(content, formatOptions);
 
     // Determine output path

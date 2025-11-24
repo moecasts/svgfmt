@@ -158,3 +158,22 @@ describe('formatPattern', () => {
     }
   });
 });
+
+describe('Transform functionality', () => {
+  const fixturesDir = path.join(__dirname, 'fixtures');
+
+  test('should pass through transform function to core formatter', async () => {
+    const tempFile = temporaryFile({ extension: 'svg' });
+    await fs.copyFile(path.join(fixturesDir, 'single-color.svg'), tempFile);
+
+    // Create a simple transform function that adds a custom attribute
+    const transform = (svg: string) =>
+      svg.replace(/<svg/, '<svg data-test="passthrough"');
+
+    const summary = await formatPattern(tempFile, { transform });
+
+    expect(summary.success).toBe(1);
+    const content = await fs.readFile(tempFile, 'utf-8');
+    expect(content).toContain('data-test="passthrough"');
+  });
+});

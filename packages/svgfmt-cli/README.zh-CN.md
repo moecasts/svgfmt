@@ -11,6 +11,7 @@
 - 🔄 原地格式化或输出到指定目录
 - ✨ 将单色 SVG 转换为使用 `currentColor`
 - 🧹 移除不必要的属性并优化文件大小
+- 🔧 自定义转换函数（文件或内联代码）
 - 📦 易于集成到构建流程中
 
 ## 安装
@@ -75,6 +76,7 @@ for (const result of summary.results) {
 ## 选项
 
 - `-o, --output <path>` - 输出目录或文件路径。如果未指定，将原地格式化文件。
+- `-t, --transform <value>` - 自定义转换函数：文件路径（如 `./transform.js`）或内联代码（如 `svg => svg.replace(...)`）。
 - `-V, --version` - 显示版本号
 - `-h, --help` - 显示帮助信息
 
@@ -102,6 +104,72 @@ svgfmt "src/icons/**/*.svg" -o dist/icons
 ```bash
 # 格式化并保存到新文件
 svgfmt logo.svg -o logo-formatted.svg
+```
+
+### 自定义转换
+
+您可以使用 `-t` / `--transform` 选项对 SVG 文件应用自定义转换。
+
+#### 使用转换文件
+
+创建一个导出函数的转换文件：
+
+```javascript
+// transform.js
+export default function addCustomClass(svg) {
+  return svg.replace(/<svg/, '<svg class="custom-icon"');
+}
+```
+
+或使用命名导出：
+
+```javascript
+// transform.js
+export function transform(svg) {
+  return svg.replace(/<svg/, '<svg data-processed="true"');
+}
+```
+
+然后在 CLI 中使用：
+
+```bash
+svgfmt "icons/**/*.svg" --transform ./transform.js
+```
+
+#### 使用内联代码
+
+对于简单的转换，您可以使用内联代码：
+
+```bash
+# 添加自定义属性
+svgfmt "icons/**/*.svg" -t 'svg => svg.replace(/<svg/, "<svg data-icon=\"true\"")'
+
+# 异步转换
+svgfmt "icons/**/*.svg" -t 'async svg => { await doSomething(); return svg; }'
+```
+
+#### 在编程 API 中使用
+
+```typescript
+import { formatPattern } from '@svgfmt/cli';
+
+// 直接传入转换函数
+const summary = await formatPattern('icons/**/*.svg', {
+  output: 'dist/icons',
+  transform: (svg) => {
+    // 添加自定义属性
+    return svg.replace(/<svg/, '<svg class="icon"');
+  },
+});
+
+// 或异步转换
+const summary2 = await formatPattern('icons/**/*.svg', {
+  transform: async (svg) => {
+    // 执行异步操作
+    const processed = await processWithAPI(svg);
+    return processed;
+  },
+});
 ```
 
 ## 开发

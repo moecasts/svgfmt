@@ -132,3 +132,128 @@ describe('CLI integration tests', () => {
     expect(output).toContain('Invalid SVG file');
   });
 });
+
+describe('CLI transform option tests', () => {
+  const fixturesDir = path.join(__dirname, 'fixtures');
+  const transformsDir = path.join(fixturesDir, 'transforms');
+  const cliPath = path.join(__dirname, '../dist/cli.js');
+
+  test('should apply transform from file path', async () => {
+    const tempFile = temporaryFile({ extension: 'svg' });
+    await fs.copyFile(path.join(fixturesDir, 'single-color.svg'), tempFile);
+
+    const transformPath = path.join(transformsDir, 'add-class.js');
+    const { stdout } = await execa('node', [
+      cliPath,
+      tempFile,
+      '--transform',
+      transformPath,
+    ]);
+
+    expect(stdout).toContain('Formatted 1/1 files');
+
+    // Verify transform was applied
+    const content = await fs.readFile(tempFile, 'utf-8');
+    expect(content).toContain('class="custom-icon"');
+  });
+
+  test('should apply transform from inline code', async () => {
+    const tempFile = temporaryFile({ extension: 'svg' });
+    await fs.copyFile(path.join(fixturesDir, 'single-color.svg'), tempFile);
+
+    const inlineCode = 'svg => svg.replace(/<svg/, \'<svg data-cli="test"\')';
+    const { stdout } = await execa('node', [
+      cliPath,
+      tempFile,
+      '-t',
+      inlineCode,
+    ]);
+
+    expect(stdout).toContain('Formatted 1/1 files');
+
+    // Verify transform was applied
+    const content = await fs.readFile(tempFile, 'utf-8');
+    expect(content).toContain('data-cli="test"');
+  });
+
+  test('should apply transform to multiple files', async () => {
+    const tempDir = temporaryDirectory();
+    await fs.copyFile(
+      path.join(fixturesDir, 'single-color.svg'),
+      path.join(tempDir, 'single-color.svg'),
+    );
+    await fs.copyFile(
+      path.join(fixturesDir, 'multi-color.svg'),
+      path.join(tempDir, 'multi-color.svg'),
+    );
+
+    const pattern = path.join(tempDir, '*.svg');
+    const transformPath = path.join(transformsDir, 'add-data-attr.js');
+
+    const { stdout } = await execa('node', [
+      cliPath,
+      pattern,
+      '--transform',
+      transformPath,
+    ]);
+
+    expect(stdout).toContain('Formatted 2/2 files');
+
+    // Verify transform was applied to all files
+    const files = await fs.readdir(tempDir);
+    for (const file of files) {
+      const content = await fs.readFile(path.join(tempDir, file), 'utf-8');
+      expect(content).toContain('data-transformed="true"');
+    }
+  });
+
+  test('should show help including transform option', async () => {
+    const { stdout } = await execa('node', [cliPath, '--help']);
+    expect(stdout).toContain('-t, --transform');
+    expect(stdout).toContain('Transform function');
+  });
+
+  test('should handle invalid transform file gracefully', async () => {
+    const tempFile = temporaryFile({ extension: 'svg' });
+    await fs.copyFile(path.join(fixturesDir, 'single-color.svg'), tempFile);
+
+    const transformPath = path.join(transformsDir, 'invalid.js');
+
+    const result = await execa('node', [
+      cliPath,
+      tempFile,
+      '--transform',
+      transformPath,
+    ]).catch((error) => error);
+
+    expect(result.exitCode).toBe(1);
+    const output = (result.stdout || '') + (result.stderr || '');
+    expect(output).toContain('Transform file must export');
+  });
+
+  test('should combine transform with output option', async () => {
+    const tempFile = temporaryFile({ extension: 'svg' });
+    const outputFile = temporaryFile({ extension: 'svg' });
+    await fs.copyFile(path.join(fixturesDir, 'single-color.svg'), tempFile);
+
+    const inlineCode =
+      'svg => svg.replace(/<svg/, \'<svg data-output="test"\')';
+
+    await execa('node', [
+      cliPath,
+      tempFile,
+      '-o',
+      outputFile,
+      '-t',
+      inlineCode,
+    ]);
+
+    // Original file should be unchanged
+    const originalContent = await fs.readFile(tempFile, 'utf-8');
+    expect(originalContent).not.toContain('data-output="test"');
+
+    // Output file should have transform applied
+    const outputContent = await fs.readFile(outputFile, 'utf-8');
+    expect(outputContent).toContain('data-output="test"');
+  });
+});

@@ -11,6 +11,7 @@ CLI tool for formatting SVG files using [@svgfmt/core](../svgfmt-core).
 - 🔄 In-place formatting or output to specified directory
 - ✨ Converts single-color SVGs to use `currentColor`
 - 🧹 Removes unnecessary attributes and optimizes file size
+- 🔧 Custom transform functions (file or inline code)
 - 📦 Easy to integrate into build pipelines
 
 ## Installation
@@ -75,6 +76,7 @@ for (const result of summary.results) {
 ## Options
 
 - `-o, --output <path>` - Output directory or file path. If not specified, files are formatted in place.
+- `-t, --transform <value>` - Custom transform function: file path (e.g., `./transform.js`) or inline code (e.g., `svg => svg.replace(...)`).
 - `-V, --version` - Display version number
 - `-h, --help` - Display help information
 
@@ -102,6 +104,72 @@ svgfmt "src/icons/**/*.svg" -o dist/icons
 ```bash
 # Format and save to new file
 svgfmt logo.svg -o logo-formatted.svg
+```
+
+### Custom Transform
+
+You can apply custom transformations to SVG files using the `-t` / `--transform` option.
+
+#### Using a Transform File
+
+Create a transform file that exports a function:
+
+```javascript
+// transform.js
+export default function addCustomClass(svg) {
+  return svg.replace(/<svg/, '<svg class="custom-icon"');
+}
+```
+
+Or use a named export:
+
+```javascript
+// transform.js
+export function transform(svg) {
+  return svg.replace(/<svg/, '<svg data-processed="true"');
+}
+```
+
+Then use it with the CLI:
+
+```bash
+svgfmt "icons/**/*.svg" --transform ./transform.js
+```
+
+#### Using Inline Code
+
+For simple transformations, you can use inline code:
+
+```bash
+# Add a custom attribute
+svgfmt "icons/**/*.svg" -t 'svg => svg.replace(/<svg/, "<svg data-icon=\"true\"")'
+
+# Async transform
+svgfmt "icons/**/*.svg" -t 'async svg => { await doSomething(); return svg; }'
+```
+
+#### Using with Programmatic API
+
+```typescript
+import { formatPattern } from '@svgfmt/cli';
+
+// Pass a transform function directly
+const summary = await formatPattern('icons/**/*.svg', {
+  output: 'dist/icons',
+  transform: (svg) => {
+    // Add custom attributes
+    return svg.replace(/<svg/, '<svg class="icon"');
+  },
+});
+
+// Or async transform
+const summary2 = await formatPattern('icons/**/*.svg', {
+  transform: async (svg) => {
+    // Perform async operations
+    const processed = await processWithAPI(svg);
+    return processed;
+  },
+});
 ```
 
 ## Development
