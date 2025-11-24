@@ -1,101 +1,103 @@
 # @svgfmt/core
 
-SVG 格式化和优化的核心库，提供强大的 SVG 处理功能。
+[English](./README.md) | [简体中文](./README.zh-CN.md)
 
-## 安装
+Core library for SVG formatting and optimization, providing powerful SVG processing capabilities.
+
+## Installation
 
 ```bash
 pnpm add @svgfmt/core
 ```
 
-## 基本使用
+## Basic Usage
 
-### 格式化 SVG
+### Formatting SVG
 
 ```typescript
 import { format } from '@svgfmt/core';
 
-// 基本格式化
+// Basic formatting
 const optimizedSvg = await format(svgContent);
 
-// 自定义配置
+// Custom configuration
 const customSvg = await format(svgContent, {
-  traceResolution: 800, // 提高路径合并分辨率
+  traceResolution: 800, // Increase path merging resolution
 });
 ```
 
-### 颜色处理
+### Color Processing
 
-库会自动检测 SVG 中的颜色，并进行以下处理：
+The library automatically detects colors in SVG and performs the following processing:
 
-- **单一颜色检测**：识别只使用一种颜色的 SVG
-- **颜色移除**：将单一颜色统一为黑色，然后移除颜色属性，使其继承父元素颜色
-- **多色保持**：对于多色 SVG，保持原始颜色不变
-- **透明度处理**：移除不必要的透明度属性
+- **Single Color Detection**: Identifies SVGs that use only one color
+- **Color Removal**: Unifies single colors to black, then removes color attributes to inherit parent element color
+- **Multi-color Preservation**: For multi-color SVGs, maintains original colors unchanged
+- **Opacity Handling**: Removes unnecessary opacity attributes
 
-### 路径合并
+### Path Merging
 
-使用先进的图像追踪技术，将多个路径元素合并为单个路径：
+Uses advanced image tracing technology to merge multiple path elements into a single path:
 
 ```typescript
 import { format } from '@svgfmt/core';
 
-// 自动路径合并
+// Automatic path merging
 const mergedSvg = await format(complexSvg, {
-  traceResolution: 600, // 路径追踪分辨率
+  traceResolution: 600, // Path tracing resolution
 });
 ```
 
-## API 文档
+## API Documentation
 
 ### `format(svgContent, options?)`
 
-主要的 SVG 格式化函数。
+The main SVG formatting function.
 
-**参数：**
+**Parameters:**
 
-- `svgContent: string` - 要处理的 SVG 内容
-- `options?: FormatOptions` - 可选的配置选项
+- `svgContent: string` - The SVG content to process
+- `options?: FormatOptions` - Optional configuration options
 
-**返回值：**
+**Returns:**
 
-- `Promise<string>` - 格式化后的 SVG 内容
+- `Promise<string>` - Formatted SVG content
 
 ### `FillifyOptions`
 
-路径合并处理的配置选项。
+Configuration options for path merging processing.
 
 ```typescript
 interface FillifyOptions {
-  /** 路径追踪分辨率，默认: 600 */
+  /** Path tracing resolution, default: 600 */
   traceResolution?: number;
 }
 ```
 
 ### `FormatOptions`
 
-格式化处理的配置选项，扩展自 `FillifyOptions`。
+Configuration options for formatting processing, extends `FillifyOptions`.
 
 ```typescript
 interface FormatOptions extends FillifyOptions {
-  /** 自定义转换函数 */
+  /** Custom transform function */
   transform?: (svg: string) => string | Promise<string>;
 }
 ```
 
-## 处理流程
+## Processing Flow
 
-1. **预处理**：去除尺寸、透明度、样式和脚本等不必要的属性
-2. **颜色统一**：检测并统一单一颜色为黑色
-3. **路径合并**：使用图像追踪技术合并路径
-4. **颜色移除**：移除颜色属性，使其继承父元素颜色
-5. **SVG 优化**：使用 SVGO 进行深度优化
-6. **代码格式化**：使用 Prettier 美化输出代码
-7. **自定义转换**：执行用户提供的自定义转换函数
+1. **Preprocessing**: Remove unnecessary attributes like dimensions, opacity, styles, and scripts
+2. **Color Unification**: Detect and unify single colors to black
+3. **Path Merging**: Merge paths using image tracing technology
+4. **Color Removal**: Remove color attributes to inherit parent element color
+5. **SVG Optimization**: Perform deep optimization using SVGO
+6. **Code Formatting**: Beautify output code using Prettier
+7. **Custom Transform**: Execute user-provided custom transform function
 
-## 示例
+## Examples
 
-### 处理单色图标
+### Processing Single-Color Icon
 
 ```typescript
 const input = `<svg width="24" height="24" viewBox="0 0 24 24">
@@ -103,10 +105,10 @@ const input = `<svg width="24" height="24" viewBox="0 0 24 24">
 </svg>`;
 
 const output = await format(input);
-// 结果将移除固定颜色，使其继承父元素颜色
+// Result will remove fixed color to inherit parent element color
 ```
 
-### 处理复杂多路径 SVG
+### Processing Complex Multi-Path SVG
 
 ```typescript
 const complexSvg = `<svg>
@@ -115,67 +117,67 @@ const complexSvg = `<svg>
 </svg>`;
 
 const merged = await format(complexSvg);
-// 结果将是合并为单个路径的优化 SVG
+// Result will be an optimized SVG merged into a single path
 ```
 
-### 使用自定义转换函数
+### Using Custom Transform Function
 
 ```typescript
 import { format } from '@svgfmt/core';
 
-// 使用同步转换函数
+// Using synchronous transform function
 const customSvg = await format(svgContent, {
-  // 自定义转换：添加class属性到svg元素
+  // Custom transform: add class attribute to svg element
   transform: (svg) => svg.replace(/<svg/, '<svg class="icon"'),
 });
 
-// 使用异步转换函数
+// Using asynchronous transform function
 const asyncCustomSvg = await format(svgContent, {
-  // 异步自定义转换示例
+  // Async custom transform example
   transform: async (svg) => {
-    // 模拟异步操作
+    // Simulate async operation
     await new Promise(resolve => setTimeout(resolve, 50));
     return svg;
   },
 });
 ```
 
-## 开发
+## Development
 
-### 安装依赖
+### Install Dependencies
 
 ```bash
 pnpm install
 ```
 
-### 构建
+### Build
 
 ```bash
 pnpm build
 ```
 
-### 开发模式
+### Development Mode
 
 ```bash
 pnpm dev
 ```
 
-### 测试
+### Testing
 
 ```bash
 pnpm test
 ```
 
-## 技术细节
+## Technical Details
 
-本库使用以下技术实现功能：
+This library uses the following technologies to implement its functionality:
 
-- **@iconify/tools**：SVG 解析和处理
-- **oslllo-potrace**：图像追踪和路径合并
-- **oslllo-svg-fixer** 和 **oslllo-svg2**：SVG 处理和转换
-- **svgo**：SVG 优化
-- **prettier**：代码格式化
+- **@iconify/tools**: SVG parsing and processing
+- **oslllo-potrace**: Image tracing and path merging
+- **oslllo-svg-fixer** and **oslllo-svg2**: SVG processing and conversion
+- **svgo**: SVG optimization
+- **prettier**: Code formatting
 
-## 许可证
+## License
 
-[查看许可证文件](../../LICENSE)
+[View License File](../../LICENSE)

@@ -1,185 +1,187 @@
-# SVG格式化工具库
+# SVG Formatting Library
 
-一个强大的 SVG 处理工具库，专门用于优化、转换和格式化 SVG 文件，使其更适合在 Web 应用和图标系统中使用。
+[English](./README.md) | [简体中文](./README.zh-CN.md)
 
-## 核心功能
+A powerful SVG processing library specifically designed for optimizing, converting, and formatting SVG files, making them more suitable for use in web applications and icon systems.
 
-### SVG 格式化
+## Core Features
+
+### SVG Formatting
 
 ```typescript
 import { format } from '@svgfmt/core';
 
-// 格式化单个 SVG
+// Format a single SVG
 const optimizedSvg = await format(svgContent);
 
-// 自定义配置
+// Custom configuration
 const customSvg = await format(svgContent, {
-  traceResolution: 800, // 提高路径合并分辨率
+  traceResolution: 800, // Increase path merging resolution
 });
 ```
 
-### 颜色处理
+### Color Processing
 
-- **单色统一**：检测并统一单一颜色的 SVG 元素
-- **颜色移除**：移除固定的颜色值，使其继承父元素的颜色
-- **透明度处理**：移除不必要的透明度属性
+- **Single Color Unification**: Detects and unifies SVG elements with a single color
+- **Color Removal**: Removes fixed color values to inherit parent element color
+- **Opacity Handling**: Removes unnecessary opacity attributes
 
-### 路径优化
+### Path Optimization
 
-- **路径合并**：使用先进的图像追踪技术合并多个路径
-- **形状转换**：将复杂形状转换为优化的路径
-- **无用元素清理**：移除隐藏元素和无用容器
+- **Path Merging**: Merges multiple paths using advanced image tracing technology
+- **Shape Conversion**: Converts complex shapes into optimized paths
+- **Cleanup**: Removes hidden elements and useless containers
 
-## 安装使用
+## Installation and Usage
 
-### 安装依赖
+### Install Dependencies
 
 ```bash
 pnpm install
 ```
 
-### 构建项目
+### Build Project
 
 ```bash
 pnpm build
 ```
 
-### 开发模式
+### Development Mode
 
 ```bash
 pnpm dev
 ```
 
-### 代码检查与格式化
+### Code Linting and Formatting
 
 ```bash
-# 代码检查
+# Code linting
 pnpm lint
 
-# 类型检查
+# Type checking
 pnpm check-types
 
-# 代码格式化
+# Code formatting
 pnpm format
 
-# 完整检查
+# Full check
 pnpm biome:check
 ```
 
-## 项目结构
+## Project Structure
 
 ```text
 svgfmt/
 ├── packages/
-│   └── svgfmt-core/           # 核心库
+│   └── svgfmt-core/           # Core library
 │       ├── src/
-│       │   ├── index.ts       # 主入口，提供格式化功能
-│       │   └── fillify/       # 路径合并模块
-│       └── tests/             # 测试文件
-├── biome.json                 # 代码格式化配置
-├── turbo.json                 # Turborepo 配置
+│       │   ├── index.ts       # Main entry point, provides formatting functionality
+│       │   └── fillify/       # Path merging module
+│       └── tests/             # Test files
+├── biome.json                 # Code formatting configuration
+├── turbo.json                 # Turborepo configuration
 └── package.json
 ```
 
-## 技术栈
+## Technology Stack
 
-- **核心库**：使用 TypeScript 构建
-- **图像处理**：基于 Potrace 算法的路径追踪
-- **SVG 优化**：集成 SVGO 进行专业优化
-- **代码格式化**：使用 Prettier 进行代码美化
-- **构建工具**：Rslib + Turborepo
+- **Core Library**: Built with TypeScript
+- **Image Processing**: Path tracing based on the Potrace algorithm
+- **SVG Optimization**: Integrated with SVGO for professional optimization
+- **Code Formatting**: Uses Prettier for code beautification
+- **Build Tools**: Rslib + Turborepo
 
-## API 参考
+## API Reference
 
 ### `format(svgContent, options?)`
 
-格式化 SVG 字符串的主要函数。
+The main function for formatting SVG strings.
 
-**参数：**
+**Parameters:**
 
-- `svgContent: string` - 要处理的 SVG 内容
-- `options?: FormatOptions` - 可选配置对象
+- `svgContent: string` - The SVG content to process
+- `options?: FormatOptions` - Optional configuration object
 
-**选项：**
+**Options:**
 
-- `traceResolution?: number` - 路径追踪分辨率，默认 600
-- `transform?: (svg: string) => string | Promise<string>` - 自定义转换函数
+- `traceResolution?: number` - Path tracing resolution, default 600
+- `transform?: (svg: string) => string | Promise<string>` - Custom transform function
 
-**返回值：**
+**Returns:**
 
-- `Promise<string>` - 格式化后的 SVG 内容
+- `Promise<string>` - Formatted SVG content
 
 ### `FillifyOptions`
 
-路径合并处理的配置选项。
+Configuration options for path merging processing.
 
 ```typescript
 interface FillifyOptions {
-  /** 路径追踪分辨率，默认: 600 */
+  /** Path tracing resolution, default: 600 */
   traceResolution?: number;
 }
 ```
 
 ### `FormatOptions`
 
-格式化处理的配置选项，扩展自 `FillifyOptions`。
+Configuration options for formatting processing, extends `FillifyOptions`.
 
 ```typescript
 interface FormatOptions extends FillifyOptions {
-  /** 自定义转换函数 */
+  /** Custom transform function */
   transform?: (svg: string) => string | Promise<string>;
 }
 ```
 
-## 使用示例
+## Usage Examples
 
-### 基础使用
+### Basic Usage
 
 ```typescript
 import { format } from '@svgfmt/core';
 
-// 处理单色图标
+// Process single-color icon
 const svgContent = `<svg><path fill="#ff0000" d="..."/></svg>`;
 const optimized = await format(svgContent);
-// 结果: <svg><path d="..."/></svg> // 颜色被移除，继承父元素颜色
+// Result: <svg><path d="..."/></svg> // Color removed, inherits parent element color
 ```
 
-### 高级配置
+### Advanced Configuration
 
 ```typescript
 import { format } from '@svgfmt/core';
 
-// 处理复杂图标，提高处理质量
+// Process complex icon with higher quality
 const complexSvg = await format(svgContent, {
-  traceResolution: 1200, // 更高分辨率，更好质量
+  traceResolution: 1200, // Higher resolution for better quality
 });
 
-// 使用自定义转换函数
+// Use custom transform function
 const customSvg = await format(svgContent, {
-  // 自定义转换：将所有路径设置为红色
+  // Custom transform: set all paths to red
   transform: (svg) => svg.replace(/fill="([^"]+)"/g, 'fill="#ff0000"'),
 });
 
-// 使用异步自定义转换
+// Use async custom transform
 const asyncCustomSvg = await format(svgContent, {
-  // 异步自定义转换示例
+  // Async custom transform example
   transform: async (svg) => {
-    // 模拟异步操作，如API调用或复杂处理
+    // Simulate async operation, like API call or complex processing
     await new Promise(resolve => setTimeout(resolve, 100));
     return svg;
   },
 });
 ```
 
-## 开发指南
+## Development Guide
 
-本项目使用现代前端开发工具链：
+This project uses modern frontend development toolchain:
 
-- **包管理**：pnpm + Turborepo
-- **代码质量**：Biome + TypeScript
-- **测试**：rstest
-- **构建**：rslib
+- **Package Management**: pnpm + Turborepo
+- **Code Quality**: Biome + TypeScript
+- **Testing**: rstest
+- **Build**: rslib
 
-## 许可证
+## License
 
-[查看许可证文件](LICENSE)
+[View License File](LICENSE)

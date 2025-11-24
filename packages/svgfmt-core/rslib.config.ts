@@ -13,7 +13,7 @@ export default defineConfig({
     },
   ],
   output: {
-    // 确保输出兼容性
+    // Ensure output compatibility
     cleanDistPath: true,
   },
 });

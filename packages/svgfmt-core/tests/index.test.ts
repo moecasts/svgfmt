@@ -9,7 +9,7 @@ describe('format', () => {
   const fixturesDir = path.join(__dirname, 'fixtures');
   const solidFixturesDir = path.join(fixturesDir, 'solid');
 
-  // 读取所有测试用SVG内容
+  // Read all test SVG content
   const singleColorSvgContent = fs.readFileSync(
     path.join(fixturesDir, 'single-color.svg'),
     'utf8',
@@ -23,58 +23,58 @@ describe('format', () => {
     'utf8',
   );
 
-  test('应该成功处理单色SVG文件并将其转换为currentColor', async () => {
+  test('should successfully process single-color SVG file and convert it to currentColor', async () => {
     const result = await format(singleColorSvgContent);
     await expect(result).toMatchFileSnapshot(
       './snapshots/format-single-color.svg',
     );
 
-    // 同时验证颜色转换
+    // Also verify color conversion
     expect(result).not.toContain('red');
   });
 
-  test('应该正确处理多色SVG文件', async () => {
+  test('should correctly handle multi-color SVG files', async () => {
     const result = await format(multiColorSvgContent);
     await expect(result).toMatchFileSnapshot(
       './snapshots/format-multi-color.svg',
     );
   });
 
-  test('应该移除透明度相关属性', async () => {
+  test('should remove opacity-related attributes', async () => {
     const result = await format(opacitySvgContent);
     await expect(result).toMatchFileSnapshot(
       './snapshots/format-with-opacity.svg',
     );
 
-    // 验证透明度属性已被移除
+    // Verify opacity attributes have been removed
     expect(result).not.toContain('fill-opacity');
     expect(result).not.toContain('stroke-opacity');
   });
 
-  test('应该正确应用自定义transform函数', async () => {
-    // 测试自定义transform函数 - 在svg根元素添加自定义属性
+  test('should correctly apply custom transform function', async () => {
+    // Test custom transform function - add custom attribute to svg root element
     const customTransform = (svg: string) =>
       svg.replace(/<svg/, '<svg data-custom-transform="applied"');
     const result = await format(singleColorSvgContent, {
       transform: customTransform,
     });
 
-    // 验证自定义transform已被应用
+    // Verify custom transform has been applied
     expect(result).toContain('data-custom-transform="applied"');
 
-    // 保存快照
+    // Save snapshot
     await expect(result).toMatchFileSnapshot(
       './snapshots/format-with-custom-transform.svg',
     );
   });
 
-  test('应该批量处理solid文件夹下的所有SVG文件', async () => {
-    // 读取solid文件夹中的所有SVG文件
+  test('should batch process all SVG files under the solid folder', async () => {
+    // Read all SVG files in the solid folder
     const svgFiles = fs
       .readdirSync(solidFixturesDir)
       .filter((file) => file.endsWith('.svg'));
 
-    // 并行处理所有SVG文件
+    // Process all SVG files in parallel
     await Promise.all(
       svgFiles.map(async (svgFile) => {
         const svgContent = fs.readFileSync(

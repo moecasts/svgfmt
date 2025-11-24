@@ -5,10 +5,10 @@ import { format as prettierFormat } from 'prettier';
 import { optimize } from 'svgo';
 import { type FillifyOptions, fillify } from './fillify';
 
-// 导出类型
+// Export types
 export * from './fillify';
 
-// 默认SVGO插件配置
+// Default SVGO plugin configuration
 const DEFAULT_SVGO_PLUGINS = [
   { name: 'removeDimensions' },
   { name: 'convertShapeToPath' },
@@ -48,7 +48,7 @@ const DEFAULT_SVGO_PLUGINS = [
   { name: 'collapseGroups' },
 ];
 
-// 创建透明度和样式属性移除的SVGO配置
+// Create SVGO configuration for removing opacity and style attributes
 const createOpacityRemovalConfig = () =>
   ({
     plugins: [
@@ -62,7 +62,7 @@ const createOpacityRemovalConfig = () =>
     ],
   }) as Parameters<typeof optimize>[1];
 
-// 创建完整的SVGO优化配置
+// Create complete SVGO optimization configuration
 const createMinificationConfig = () =>
   ({
     plugins: [
@@ -81,12 +81,12 @@ const createMinificationConfig = () =>
     ],
   }) as Parameters<typeof optimize>[1];
 
-// 预处理SVG：去除尺寸、透明度、样式和脚本
+// Preprocess SVG: remove dimensions, opacity, styles and scripts
 const preprocessSvg = (svgContent: string): string => {
   return optimize(svgContent, createOpacityRemovalConfig()).data;
 };
 
-// 将单一纯色统一为黑色
+// Unify single solid color to black
 const unifySolidColorToBlack = (svgContent: string): string => {
   const colorRegex = /(?:fill|stroke)="([^"]+)"/g;
 
@@ -136,7 +136,7 @@ const unifySolidColorToBlack = (svgContent: string): string => {
   return svgContent;
 };
 
-// 将黑色转换为currentColor
+// Convert black to currentColor
 const convertBlackToCurrentColor = (svgContent: string): string => {
   const processedSvg = new SVG(svgContent);
 
@@ -159,12 +159,12 @@ const convertBlackToCurrentColor = (svgContent: string): string => {
   return processedSvg.toString();
 };
 
-// 使用SVGO优化SVG
+// Optimize SVG using SVGO
 const minifySvg = (svgContent: string): string => {
   return optimize(svgContent, createMinificationConfig()).data;
 };
 
-// 使用Prettier格式化SVG代码
+// Format SVG code using Prettier
 const prettifySvg = async (svgContent: string): Promise<string> => {
   return await prettierFormat(svgContent, { parser: 'html' });
 };
@@ -174,7 +174,7 @@ export interface FormatOptions extends FillifyOptions {
   transform?: (svg: string) => string | Promise<string>;
 }
 
-// 格式化SVG的主函数
+// Main function for formatting SVG
 export async function format(
   svgContent: string,
   options: FormatOptions = {},
@@ -190,7 +190,7 @@ export async function format(
   // 合并路径
   svgContent = await fillify(svgContent, fillifyOptions);
 
-  // 将黑色转换为currentColor
+  // Convert black to currentColor
   svgContent = convertBlackToCurrentColor(svgContent);
 
   // 优化SVG
