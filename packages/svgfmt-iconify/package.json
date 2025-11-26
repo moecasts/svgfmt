@@ -1,0 +1,38 @@
+{
+  "name": "@svgfmt/iconify",
+  "version": "0.0.0",
+  "type": "module",
+  "description": "Enhanced Iconify icon set tools with @svgfmt/core integration",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "main": "./dist/index.cjs",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "rslib build",
+    "dev": "rslib build --watch",
+    "test": "rstest",
+    "prepublishOnly": "pnpm run build"
+  },
+  "dependencies": {
+    "@svgfmt/core": "workspace:*",
+    "@iconify/tools": "^4.1.4",
+    "@iconify/types": "^2.0.0"
+  },
+  "devDependencies": {
+    "@rslib/core": "^0.18.2",
+    "@rstest/core": "^0.6.6",
+    "@types/node": "^24.10.1",
+    "typescript": "^5.9.3"
+  }
+}

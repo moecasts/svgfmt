@@ -1,0 +1,29 @@
+# Build outputs
+dist/
+*.tsbuildinfo
+
+# Test outputs
+tests/output/
+coverage/
+
+# Example outputs
+examples/output/
+
+# Dependencies
+node_modules/
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
